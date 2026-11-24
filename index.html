@@ -117,6 +117,7 @@ button{background:none;border:none;cursor:pointer}
 .text-layer span::selection{background:rgba(37,99,235,.3)}
 .text-layer span.shl{background:rgba(255,200,0,.4)!important;border-radius:2px}
 [data-tool="textselect"] .text-layer{pointer-events:auto;z-index:20;cursor:text}
+[data-tool="textselect"] .text-layer span:hover{background:rgba(37,99,235,.18)!important;color:transparent;border-radius:2px;outline:1px solid rgba(37,99,235,.3);cursor:pointer}
 [data-tool="textselect"] .upper-canvas{pointer-events:none!important}
 .canvas-container .upper-canvas{z-index:10!important}.canvas-container .lower-canvas{z-index:1!important}
 
@@ -225,6 +226,62 @@ input[type="range"]{width:100%;accent-color:var(--ac);margin-top:1px}
 /* Form fields overlay */
 .form-field{position:absolute;border:1px solid var(--ac);background:rgba(37,99,235,.05);font-size:12px;padding:2px 4px;outline:none;border-radius:2px;z-index:5}
 .form-field:focus{background:rgba(37,99,235,.1);box-shadow:0 0 0 2px var(--acs)}
+
+/* Mobile */
+@media(max-width:768px){
+  #sidebar,#properties{display:none!important}
+  #menubar{display:none}
+  .header-left{min-width:auto}
+  .logo{font-size:12px}
+  #header{padding:0 6px;height:36px;gap:4px}
+  .search-box{height:28px;width:100%}
+  .search-box input{font-size:11px}
+  .header-right{min-width:auto;gap:1px}
+  .ib{width:26px;height:26px}
+  .ib svg{width:14px;height:14px}
+  #toolbar{height:34px;gap:0;padding:0 2px;-webkit-overflow-scrolling:touch}
+  .tb{width:28px;height:28px;min-width:28px}
+  .tb svg{width:13px;height:13px}
+  .ts{margin:0 1px;height:14px}
+  .view-toggle{display:none}
+  .ur{display:none}
+  .toolbar-spacer{min-width:2px;flex:0}
+  #zc button{width:22px;height:22px;font-size:12px}
+  #zd{font-size:10px;min-width:32px}
+  #canvas-area{padding:4px}
+  #statusbar{font-size:9px;padding:0 4px;height:20px;gap:4px}
+  #pn button{font-size:9px}
+  #pi{width:22px;font-size:9px}
+  #tab-bar{height:28px;padding:0 4px}
+  .doc-tab{font-size:10px;padding:2px 6px;max-width:120px}
+  .wc{padding:16px 12px}
+  .wtitle{font-size:18px}
+  .wsub{font-size:11px;margin-bottom:14px}
+  .chips{gap:4px;margin-bottom:12px}
+  .chip{font-size:9px;padding:3px 7px}
+  .dz{padding:16px 12px}
+  .dz p{font-size:11px}
+  .obtn{padding:7px 18px;font-size:12px}
+  .ml{min-width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px);padding:14px;border-radius:10px}
+  .ml h3{font-size:14px;margin-bottom:10px}
+  .sg{grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+  .sb{padding:7px;font-size:10px}
+  .hg{font-size:10px;gap:2px 8px}
+  .ctx-menu{min-width:140px}
+  .toast{font-size:11px;bottom:28px;padding:5px 14px}
+  #frb{flex-wrap:wrap;gap:3px;top:2px;right:2px}
+  #frb input{width:90px;font-size:10px}
+  #ftb{transform:scale(.9);transform-origin:top left}
+  .snav{display:none!important}
+  .recent-item{font-size:11px;padding:4px 6px}
+}
+@media(max-width:480px){
+  .header-left{display:none}
+  .search-box{border-radius:6px}
+  #toolbar .ts:nth-child(n+8){display:none}
+  .tb:nth-child(n+16){display:none}
+  #header{height:34px}
+}
 </style>
 </head>
 <body>
@@ -283,7 +340,7 @@ input[type="range"]{width:100%;accent-color:var(--ac);margin-top:1px}
 
 <div id="toolbar">
   <button class="tb active" data-tool="select" title="Select (V)"><svg viewBox="0 0 24 24"><path d="M7 2v18l4.5-4.5h5z" fill="currentColor"/></svg></button>
-  <button class="tb" data-tool="textselect" title="Text Select (S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></button>
+  <button class="tb" data-tool="textselect" title="Edit Text — click text to edit (S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></button>
   <button class="tb" data-tool="hand" title="Hand (H)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2v18M3 11h18"/></svg></button>
   <div class="ts"></div>
   <button class="tb" data-tool="text" title="Text (T)"><svg viewBox="0 0 24 24"><text x="12" y="18" text-anchor="middle" font-size="18" font-weight="700" font-family="Georgia,serif" fill="currentColor">T</text></svg></button>
@@ -525,6 +582,33 @@ async function renderTL(pg,vp){
     else tc.items.forEach(it=>{if(!it.str)return;const sp=document.createElement('span');sp.textContent=it.str;const tx=pdfjsLib.Util.transform(vp.transform,it.transform);const fh=Math.sqrt(tx[0]*tx[0]+tx[1]*tx[1]);sp.style.cssText=`position:absolute;left:${tx[4]}px;top:${tx[5]-fh}px;font-size:${fh}px;font-family:sans-serif;white-space:pre;color:transparent;transform-origin:0 0`;tl.appendChild(sp)});
   }catch(e){}
   if(S.sq)hlSearch();
+  tl.querySelectorAll('span').forEach(sp=>{
+    sp.addEventListener('click',function(e){
+      if(S.tool!=='textselect')return;
+      e.stopPropagation();
+      editTextSpan(this);
+    });
+  });
+}
+
+function editTextSpan(sp){
+  const txt=sp.textContent;if(!txt||!txt.trim())return;
+  const rect=sp.getBoundingClientRect();
+  const wrap=S.fc.wrapperEl.getBoundingClientRect();
+  const z=S.zoom||1;
+  const left=(rect.left-wrap.left)/z;
+  const top=(rect.top-wrap.top)/z;
+  const w=rect.width/z;
+  const h=rect.height/z;
+  const fh=parseFloat(sp.style.fontSize)||14;
+  const bg=new fabric.Rect({left:left-2,top:top-1,width:w+4,height:h+2,fill:'#ffffff',stroke:'transparent',strokeWidth:0,selectable:false,evented:false,_isEditBg:true});
+  S.fc.add(bg);
+  const it=new fabric.IText(txt,{left,top,fontSize:fh,fontFamily:'Helvetica,Arial,sans-serif',fill:'#000',opacity:1,_editBg:bg});
+  S.fc.add(it);S.fc.setActiveObject(it);
+  it.enterEditing();it.selectAll();
+  setTool('select');
+  pushHist();updateLayers();
+  toast('Editing text — modify and click away to finish');
 }
 
 async function renderFormFields(pg,vp){
@@ -633,7 +717,7 @@ function saveAnn(){if(!S.fc)return;const a=S.po[S.cp-1];const j=S.fc.toJSON();de
 function loadAnn(dp){const a=S.po[dp-1];const d=S.pa[a];if(!d||!d.objects||!d.objects.length)return;const bg=S.fc.backgroundImage;S.fc.loadFromJSON(d,()=>{S.fc.setBackgroundImage(bg,()=>S.fc.renderAll())})}
 
 /* === TOOLS === */
-const TN={select:'Select',textselect:'Text Select',hand:'Hand',text:'Text',pen:'Pen',highlight:'Highlight',rect:'Rectangle',circle:'Circle',line:'Line',arrow:'Arrow',eraser:'Eraser',comment:'Comment',redact:'Redact',crop:'Crop',measure:'Measure'};
+const TN={select:'Select',textselect:'Edit Text',hand:'Hand',text:'Text',pen:'Pen',highlight:'Highlight',rect:'Rectangle',circle:'Circle',line:'Line',arrow:'Arrow',eraser:'Eraser',comment:'Comment',redact:'Redact',crop:'Crop',measure:'Measure'};
 function setTool(t){
   S.tool=t;$('app').dataset.tool=t;
   document.querySelectorAll('.tb[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
