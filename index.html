@@ -576,6 +576,7 @@ async function renderPage(dp){
 
 async function renderTL(pg,vp){
   const tl=$('text-layer');tl.innerHTML='';tl.style.width=vp.width+'px';tl.style.height=vp.height+'px';
+  tl.style.setProperty('--scale-factor',vp.scale);
   try{
     const tc=await pg.getTextContent();
     if(typeof pdfjsLib.renderTextLayer==='function'){await(pdfjsLib.renderTextLayer({textContent:tc,container:tl,viewport:vp,textDivs:[]})).promise}
@@ -593,15 +594,15 @@ async function renderTL(pg,vp){
 
 function editTextSpan(sp){
   const txt=sp.textContent;if(!txt||!txt.trim())return;
-  const rect=sp.getBoundingClientRect();
-  const wrap=S.fc.wrapperEl.getBoundingClientRect();
-  const z=S.zoom||1;
-  const left=(rect.left-wrap.left)/z;
-  const top=(rect.top-wrap.top)/z;
-  const w=rect.width/z;
-  const h=rect.height/z;
-  const fh=parseFloat(sp.style.fontSize)||14;
-  const bg=new fabric.Rect({left:left-2,top:top-1,width:w+4,height:h+2,fill:'#ffffff',stroke:'transparent',strokeWidth:0,selectable:false,evented:false,_isEditBg:true});
+  const tl=$('text-layer');
+  const sf=parseFloat(getComputedStyle(tl).getPropertyValue('--scale-factor'))||BS;
+  const tlW=S.fc.width,tlH=S.fc.height;
+  let left,top;
+  if(sp.style.left&&sp.style.left.includes('%')){left=parseFloat(sp.style.left)/100*tlW;top=parseFloat(sp.style.top)/100*tlH}
+  else{left=parseFloat(sp.style.left)||0;top=parseFloat(sp.style.top)||0}
+  const fh=parseFloat(getComputedStyle(sp).fontSize)||14;
+  const cs=getComputedStyle(sp);const w=sp.offsetWidth||parseFloat(cs.width)||txt.length*fh*0.6;const h=sp.offsetHeight||fh*1.2;
+  const bg=new fabric.Rect({left:left-2,top:top-1,width:w+6,height:h+4,fill:'#ffffff',stroke:'transparent',strokeWidth:0,selectable:false,evented:false,_isEditBg:true});
   S.fc.add(bg);
   const it=new fabric.IText(txt,{left,top,fontSize:fh,fontFamily:'Helvetica,Arial,sans-serif',fill:'#000',opacity:1,_editBg:bg});
   S.fc.add(it);S.fc.setActiveObject(it);
